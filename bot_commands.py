@@ -10,7 +10,7 @@ from ldrive import Lendrive
 from log import LOGGER
 
 
-ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS, CLOSE_SINOPSIS = range(4)
+ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS, CLOSE_SINOPSIS = range(5)
 
 current_sinopsis = {}
 
