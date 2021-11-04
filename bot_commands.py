@@ -10,7 +10,7 @@ from ldrive import Lendrive
 from log import LOGGER
 
 
-ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS, CLOSE_SINOPSIS = range(5)
+ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS = range(4)
 
 current_sinopsis = {}
 
@@ -91,33 +91,12 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     query.bot.send_photo(chat_id=chat_id, photo=anime_thumb_url,
             caption=reply_text, reply_markup=kb_markup, parse_mode=PARSE_MODE)
 
-def show_sinopsis(update: Update, context: CallbackContext) -> None:
+def show_sinopsis(update: Update, context: CallbackContext):
     cmd_args = context.args
     show_arg = cmd_args[0]
     sinopsis_id = show_arg.split('_')[1]
     anime_sinopsis = current_sinopsis[sinopsis_id]
-    cb_data = {
-        'type': CLOSE_SINOPSIS,
-        'data': {
-           'uuid': sinopsis_id
-        }
-    }
-    kb = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton("Tutup", callback_data=cb_data)]
-        ]
-    )
-    update.message.reply_text(anime_sinopsis, parse_mode='HTML', reply_markup=kb)
-
-def close_sinopsis(update: Update, context: CallbackContext) -> None:
-    query = update.callback_query
-    query_data = query.data
-    sinopsis_id = query_data['data']['uuid']
-    try:
-        del current_sinopsis[sinopsis_id]
-    except KeyError:
-        query.answer("Tidak ditemukan atau sudah dihapus")
-    query.message.delete()
+    update.message.reply_text(anime_sinopsis, parse_mode='HTML')
 
 def handle_invalid_button(update: Update, context: CallbackContext) -> None:
     """Informs the user that the button is no longer available."""
@@ -137,10 +116,13 @@ def process_callback(update: Update, context: CallbackContext) -> None:
     # INFO
     if comm_type == ANIME_TITLE:
         anime_info(update, context)
-    # SINOPSIS
     elif comm_type == SHOW_SINOPSIS:
         show_sinopsis(update, context)
-    elif comm_type == CLOSE_SINOPSIS:
-        close_sinopsis(update, context)
 
     # update.effective_message.reply_text(f"Type : {str(query_data['type'])}")
+
+def is_anime_title(callback_data):
+    if callback_data['type'] == ANIME_TITLE:
+        return True
+    else:
+        return False
