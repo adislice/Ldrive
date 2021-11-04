@@ -83,12 +83,13 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     current_sinopsis[gen_id] = anime_sinopsis
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, 'show_' + gen_id)
-    kb = []
-    kb.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
+    kb_btn = []
+    kb_btn.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
     # Delete message then send the new one with photo and caption
+    kb_markup = InlineKeyboardMarkup(kb_btn)
     query.message.delete()
     query.bot.send_photo(chat_id=chat_id, photo=anime_thumb_url,
-            caption=reply_text, reply_markup=kb, parse_mode=PARSE_MODE)
+            caption=reply_text, reply_markup=kb_markup, parse_mode=PARSE_MODE)
 
 def show_sinopsis(update: Update, context: CallbackContext) -> None:
     cmd_args = context.args
@@ -132,7 +133,7 @@ def process_callback(update: Update, context: CallbackContext) -> None:
     user_id = query.from_user.id
     chat_id = query.message.chat_id
     comm_type = query_data['type']
-    LOGGER.info(f"Received query from {query_data['user_id']}, type {str(comm_type)}")
+    LOGGER.info(f"Received query, type {str(comm_type)}")
     # INFO
     if comm_type == ANIME_TITLE:
         anime_info(update, context)
