@@ -1,9 +1,11 @@
+import os
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+from telegram.utils import helpers
 
 from ldrive import Lendrive
 from log import LOGGER
-from telegram.utils import helpers
+
 
 ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS = range(4)
 
@@ -11,7 +13,6 @@ current_sinopsis = {}
 
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Bot is running...")
-
 
 def search_anime(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
