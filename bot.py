@@ -20,7 +20,7 @@ def main() -> None:
     updater.dispatcher.add_handler(CommandHandler('start', start))
     
 
-    updater.start_polling()
+    updater.start_polling(drop_pending_updates=True)
     LOGGER.info("BOT STARTED")
     updater.idle()
 
