@@ -91,6 +91,7 @@ class Lendrive:
             'result': {
                 'anime_title' : anime_title,
                 'anime_url': anime_url,
+                'anime_thumbnail_url' : thumb_img_url,
                 'anime_details' : anime_details,
                 'anime_rating': rating,
                 'anime_genres': genres_str,

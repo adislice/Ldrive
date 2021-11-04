@@ -4,6 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMe
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
 from telegram.utils import helpers
 from dotenv import load_dotenv
+from telegram.utils.types import FileInput
 
 from ldrive import Lendrive
 from log import LOGGER
@@ -77,13 +78,17 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     reply_text += anime_result['anime_rating'] + "⭐" 
     anime_sinopsis = f"<b>Sinopsis {anime_result['anime_title']}</b>\n\n" + anime_result['anime_sinopsis']
     anime_url = anime_result['anime_url']
+    anime_thumb_url = anime_result['anime_thumbnail_url']
     gen_id = uuid.uuid4().hex[:8]
     current_sinopsis[gen_id] = anime_sinopsis
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, 'show=' + gen_id)
     kb = []
     kb.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
-    query.edit_message_text(reply_text, reply_markup=InlineKeyboardMarkup(kb), parse_mode='HTML')
+    # Delete message then send the new one with photo and caption
+    query.message.delete()
+    query.bot.send_photo(chat_id=chat_id, photo=anime_thumb_url,
+            caption=reply_text, reply_markup=kb, parse_mode=PARSE_MODE)
 
 def show_sinopsis(update: Update, context: CallbackContext) -> None:
     cmd_args = context.args
