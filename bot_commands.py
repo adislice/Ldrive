@@ -36,7 +36,7 @@ def search_anime(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
     search_query = update.message.text.split(" ", 1)[1]
     LOGGER.info("User "+str(user_id)+" in chat "+str(chat_id)+" , Search query : " + search_query)
-    msg = update.effective_message.reply_text(f"🔎 Mencari <code>{search_query}</code>... ", parse_mode=PARSE_MODE)
+    msg = update.effective_message.reply_text(f"🔎 Mencari <code>{search_query}</code>... ", quote=True, parse_mode=PARSE_MODE)
     lendrive = Lendrive()
     anime_search = lendrive.search(search_query)
     search_status = anime_search['status']
