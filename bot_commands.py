@@ -87,10 +87,12 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     kb_btn = []
     kb_btn.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
     # Delete message then send the new one with photo and caption
+    reply_msg_id = query.message.reply_to_message.message_id
     kb_markup = InlineKeyboardMarkup(kb_btn)
     query.message.delete()
     query.bot.send_photo(chat_id=chat_id, photo=anime_thumb_url,
-            caption=reply_text, reply_markup=kb_markup, parse_mode=PARSE_MODE)
+            caption=reply_text, reply_markup=kb_markup, 
+            reply_to_message_id=reply_msg_id ,parse_mode=PARSE_MODE)
 
 def show_sinopsis(update: Update, context: CallbackContext):
     cmd_args = context.args
