@@ -9,7 +9,7 @@ from ldrive import Lendrive
 from log import LOGGER
 
 
-ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS = range(4)
+ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS, CLOSE_SINOPSIS = range(4)
 
 current_sinopsis = {}
 
@@ -58,6 +58,10 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     query_data = query.data
     user_id = query.from_user.id
     chat_id = query.message.chat_id
+    # Check user
+    if user_id != query_data['user_id']:
+        query.answer("Who are you?! ")
+        return
     comm_data = query_data['data']
     anime_title = comm_data['title']
     anime_url = comm_data['url']
@@ -81,12 +85,33 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     kb.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
     query.edit_message_text(reply_text, reply_markup=InlineKeyboardMarkup(kb), parse_mode='HTML')
 
-def show_sinopsis(update: Update, context: CallbackContext):
+def show_sinopsis(update: Update, context: CallbackContext) -> None:
     cmd_args = context.args
     show_arg = cmd_args[0]
     sinopsis_id = show_arg.split('=')[1]
     anime_sinopsis = current_sinopsis[sinopsis_id]
-    update.message.reply_text(anime_sinopsis, parse_mode='HTML')
+    cb_data = {
+        'type': CLOSE_SINOPSIS,
+        'data': {
+           'uuid': sinopsis_id
+        }
+    }
+    kb = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("Tutup", callback_data=cb_data)]
+        ]
+    )
+    update.message.reply_text(anime_sinopsis, parse_mode='HTML', reply_markup=kb)
+
+def close_sinopsis(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query_data = query.data
+    sinopsis_id = query_data['data']['uuid']
+    try:
+        del current_sinopsis[sinopsis_id]
+    except KeyError:
+        query.answer("Tidak ditemukan atau sudah dihapus")
+    query.message.delete()
 
 def handle_invalid_button(update: Update, context: CallbackContext) -> None:
     """Informs the user that the button is no longer available."""
@@ -103,15 +128,13 @@ def process_callback(update: Update, context: CallbackContext) -> None:
     chat_id = query.message.chat_id
     comm_type = query_data['type']
     LOGGER.info(f"Received query from {query_data['user_id']}, type {str(comm_type)}")
+    # INFO
     if comm_type == ANIME_TITLE:
         anime_info(update, context)
+    # SINOPSIS
     elif comm_type == SHOW_SINOPSIS:
         show_sinopsis(update, context)
+    elif comm_type == CLOSE_SINOPSIS:
+        close_sinopsis(update, context)
 
     # update.effective_message.reply_text(f"Type : {str(query_data['type'])}")
-
-def is_anime_title(callback_data):
-    if callback_data['type'] == ANIME_TITLE:
-        return True
-    else:
-        return False
