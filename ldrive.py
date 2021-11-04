@@ -60,6 +60,9 @@ class Lendrive:
         anime_details = ""
         for detail in details_div:
             span = detail.find_all(text=True)
+            # Make first item having bold text
+            temp = span[0]
+            span[0] = f"<b>{temp}</b>"
             info = ''.join(span)
             anime_details += info + '\n'
         # find synopsis
