@@ -1,7 +1,7 @@
 import os
 import uuid
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+from telegram.ext import CallbackContext
 from telegram.utils import helpers
 from dotenv import load_dotenv
 from telegram.utils.types import FileInput
@@ -82,7 +82,7 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     gen_id = uuid.uuid4().hex[:8]
     current_sinopsis[gen_id] = anime_sinopsis
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.username, 'show=' + gen_id)
+    url = helpers.create_deep_linked_url(bot.username, 'show_' + gen_id)
     kb = []
     kb.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
     # Delete message then send the new one with photo and caption
@@ -93,7 +93,7 @@ def anime_info(update: Update, context: CallbackContext) -> None:
 def show_sinopsis(update: Update, context: CallbackContext) -> None:
     cmd_args = context.args
     show_arg = cmd_args[0]
-    sinopsis_id = show_arg.split('=')[1]
+    sinopsis_id = show_arg.split('_')[1]
     anime_sinopsis = current_sinopsis[sinopsis_id]
     cb_data = {
         'type': CLOSE_SINOPSIS,
