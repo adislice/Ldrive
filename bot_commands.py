@@ -2,6 +2,7 @@ import os
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
 from telegram.utils import helpers
+from dotenv import load_dotenv
 
 from ldrive import Lendrive
 from log import LOGGER
@@ -11,6 +12,20 @@ ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS = range(4)
 
 current_sinopsis = {}
 
+"""Load config"""
+load_dotenv('config.env')
+
+def getEnv(env:str):
+    return os.environ[env]
+
+try:
+    BOT_TOKEN = getEnv('BOT_TOKEN')
+    PARSE_MODE = getEnv('PARSE_MODE')
+except KeyError:
+    LOGGER.error("One or more environment variable are not set! Exiting...")
+    exit(1)
+
+"""Bot command handler"""
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Bot is running...")
 

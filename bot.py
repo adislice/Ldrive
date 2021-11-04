@@ -1,6 +1,9 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, InvalidCallbackData, Filters
 from log import LOGGER
-from bot_commands import show_sinopsis, start, handle_invalid_button, process_callback, search_anime, is_anime_title
+from bot_commands import (
+    show_sinopsis, start, handle_invalid_button, process_callback, search_anime, is_anime_title,
+    BOT_TOKEN, PARSE_MODE
+    )
 
 def main() -> None:
     updater = Updater(token=BOT_TOKEN, use_context=True, arbitrary_callback_data=True)
