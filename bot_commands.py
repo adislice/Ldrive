@@ -1,4 +1,5 @@
 import os
+import uuid
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
 from telegram.utils import helpers
@@ -72,19 +73,19 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     reply_text += anime_result['anime_rating'] + "⭐" 
     anime_sinopsis = f"<b>Sinopsis {anime_result['anime_title']}</b>\n\n" + anime_result['anime_sinopsis']
     anime_url = anime_result['anime_url']
-    current_sinopsis[user_id] = anime_sinopsis
+    gen_id = uuid.uuid4().hex[:8]
+    current_sinopsis[gen_id] = anime_sinopsis
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.username, 'show')
+    url = helpers.create_deep_linked_url(bot.username, 'show=' + gen_id)
     kb = []
     kb.append([InlineKeyboardButton('Lihat Sinopsis', url=url)])
     query.edit_message_text(reply_text, reply_markup=InlineKeyboardMarkup(kb), parse_mode='HTML')
 
 def show_sinopsis(update: Update, context: CallbackContext):
-    user_id = update.effective_message.from_user.id
-    chat_id = update.effective_chat.id
-    anime_sinopsis = current_sinopsis[user_id]
-    payload = context.args
-    LOGGER.info(payload)
+    cmd_args = context.args
+    show_arg = cmd_args[0]
+    sinopsis_id = show_arg.split('=')[1]
+    anime_sinopsis = current_sinopsis[sinopsis_id]
     update.message.reply_text(anime_sinopsis, parse_mode='HTML')
 
 def handle_invalid_button(update: Update, context: CallbackContext) -> None:
