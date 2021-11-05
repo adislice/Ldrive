@@ -1,32 +1,17 @@
-import os
 import uuid
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
 from telegram.utils import helpers
-from dotenv import load_dotenv
-from telegram.utils.types import FileInput
 
-import utils
-from ldrive import Lendrive
-from log import LOGGER
+import bot.lendrive.utils as lenutils
+from bot.lendrive.ldrive import Lendrive
+from bot.log import LOGGER
+from bot.config import PARSE_MODE
 
 
 ANIME_TITLE, SEARCH_RESULT, ANIME_DETAILS, SHOW_SINOPSIS, GET_EPISODE = range(5)
 
 current_sinopsis = {}
-
-"""Load config"""
-load_dotenv('config.env')
-
-def getEnv(env:str):
-    return os.environ[env]
-
-try:
-    BOT_TOKEN = getEnv('BOT_TOKEN')
-    PARSE_MODE = getEnv('PARSE_MODE')
-except KeyError:
-    LOGGER.error("One or more environment variable are not set! Exiting...")
-    exit(1)
 
 """Bot command handler"""
 def start(update: Update, context: CallbackContext) -> None:
@@ -78,7 +63,7 @@ def anime_info(update: Update, context: CallbackContext) -> None:
     reply_text += helpers.mention_html(user_id, '​')
     reply_text += "<b>"+ anime_result['anime_title'] + "</b>" + '\n\n'
     reply_text += anime_result['anime_details']
-    rating = utils.get_rating(anime_result['anime_rating'])
+    rating = lenutils.get_rating(anime_result['anime_rating'])
     reply_text += rating+"\n"
     reply_text += f"<b>Genres:</b> {anime_result['anime_genres']}\n"
     anime_sinopsis = f"<b>Sinopsis {anime_result['anime_title']}</b>\n\n" + anime_result['anime_sinopsis']
@@ -109,7 +94,7 @@ def anime_info(update: Update, context: CallbackContext) -> None:
             }
         }
         btn_episodes.append(InlineKeyboardButton(text=str(ep_num), callback_data=cb_data))
-    kb_layout = utils.create_pages(btn_episodes)
+    kb_layout = lenutils.create_pages(btn_episodes)
     kb = kb_btn + kb_layout[1]
     # Delete message then send the new one with photo and caption
     reply_msg_id = query.message.reply_to_message.message_id
@@ -139,7 +124,7 @@ def get_episode(update: Update, context: CallbackContext) -> None:
     LOGGER.info(f"Processing {anime_title} ep {ep_num}")
     lendrive = Lendrive()
     ep_result = lendrive.parse_episode(ep_url)
-    post_dl_link = utils.dl_links_to_post(ep_result)
+    post_dl_link = lenutils.dl_links_to_post(ep_result)
     post_dl_link += helpers.mention_html(user_id,'​')
     episode_thumb = ep_result['thumbnail']
     LOGGER.info("Episode thumb : " + str(episode_thumb))
